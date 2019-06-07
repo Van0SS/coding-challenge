@@ -22,6 +22,6 @@ public class ExampleController {
     @GetMapping
     @ApiOperation(value = "Get info about words frequency")
     public String get(long limit, long offset) {
-        return service.getAsCsv(limit, offset);
+        return service.getAsCsv(limit, offset, true);
     }
 }
