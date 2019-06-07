@@ -27,6 +27,7 @@ public class WordService {
 
     @PostConstruct
     public void parse() {
+        long cur = System.currentTimeMillis();
         File file = null;
         try {
             file = new File(Resources.getResource("100-0.txt").toURI());
@@ -45,13 +46,13 @@ public class WordService {
             frequency.addValue(next);
         }
         input.close();
-        long cur = System.currentTimeMillis();
         Iterator<Comparable<?>> iter = frequency.valuesIterator();
         while (iter.hasNext()) {
             Comparable<?> value = iter.next();
             list.add(new Word(String.valueOf(value), frequency.getCount(value), frequency.getPct(value)));
         }
-        log.debug("init done took: " + (System.currentTimeMillis() - cur));
+        log.debug("count " + list.size());
+        log.debug("init done, took: " + (System.currentTimeMillis() - cur));
     }
 
     public String getAsCsv(long limit, long offset, boolean sortByAlph, boolean asc) {
