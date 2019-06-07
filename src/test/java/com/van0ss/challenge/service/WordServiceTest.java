@@ -8,6 +8,8 @@ public class WordServiceTest {
 
     @Test
     public void parse() {
-        new WordService().parse();
+        WordService word = new WordService();
+        word.parse();
+        System.out.println(word.getAsCsv(10, 5));
     }
 }

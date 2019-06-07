@@ -18,8 +18,8 @@ public class WordService {
 
     @PostConstruct
     public void parse() {
-        File file = new File("/home/ikudryav/git/van0ss/coding-challenge/src/main/resources/small.txt");
-//        File file = new File("/home/ikudryav/git/van0ss/coding-challenge/src/main/resources/100-0.txt");
+//        File file = new File("/home/ikudryav/git/van0ss/coding-challenge/src/main/resources/small.txt");
+        File file = new File("/home/ikudryav/git/van0ss/coding-challenge/src/main/resources/100-0.txt");
         Scanner input = null;
         try {
             input = new Scanner(file);
@@ -33,22 +33,25 @@ public class WordService {
         input.close();
         log.debug("count for 'one'" + frequency.getCount("one"));
 //        log.debug(frequency.toString());
+
     }
 
-    public String getAsCsv() {
+    public String getAsCsv(long limit, long offset) {
         StringBuilder builder = new StringBuilder("word,count,frequency\n");
 
         Iterator<Comparable<?>> iter = frequency.valuesIterator();
-        while (iter.hasNext()) {
+        int i = 0;
+        while (iter.hasNext() && i < (limit + offset)) {
             Comparable<?> value = iter.next();
-            builder.append(value);
-            builder.append(',');
-            builder.append(frequency.getCount(value));
-            builder.append(',');
-            builder.append(frequency.getPct(value));
-//            builder.append(',');
-//            builder.append(frequency.getCumPct(value));
-            builder.append('\n');
+            if (i >= offset) {
+                builder.append(value);
+                builder.append(',');
+                builder.append(frequency.getCount(value));
+                builder.append(',');
+                builder.append(frequency.getPct(value));
+                builder.append('\n');
+            }
+            i++;
         }
         return builder.toString();
     }
