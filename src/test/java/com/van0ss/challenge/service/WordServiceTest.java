@@ -10,6 +10,6 @@ public class WordServiceTest {
     public void parse() {
         WordService word = new WordService();
         word.parse();
-        System.out.println(word.getAsCsv(10, 5, true));
+        System.out.println(word.getAsCsv(10, 5, true, true));
     }
 }
