@@ -1,10 +1,8 @@
 package com.van0ss.challenge.service;
 
-import com.google.common.collect.Streams;
 import com.google.common.io.Resources;
 import com.van0ss.challenge.model.Word;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.math3.stat.Frequency;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -13,24 +11,19 @@ import java.io.FileNotFoundException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Queue;
+import java.util.Map;
 import java.util.Scanner;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingDeque;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 public class WordService {
 
-    private final Frequency frequency = new Frequency(String.CASE_INSENSITIVE_ORDER);
 
-    private List<Word> list;
+    private List<Word> list = new ArrayList<>();
+
+    private final Map<String, Long> map = new HashMap<>();
 
     @PostConstruct
     public void parse() {
@@ -48,15 +41,25 @@ public class WordService {
             log.error("", e);
         }
         input.useDelimiter("[^a-zA-Z]+");
+        int totFreq = 0;
         while (input.hasNext()) {
+            totFreq++;
             String next = input.next();
-            frequency.addValue(next);
+
+            Long aLong = map.get(next);
+
+            if (aLong == null) {
+                map.put(next, 1L);
+            } else {
+                long l = aLong + 1;
+                map.put(next, l);
+            }
         }
         input.close();
-        Iterator<Comparable<?>> iter = frequency.valuesIterator();
-        list = Streams.stream(iter).map(value -> new Word(String.valueOf(value), frequency.getCount(value), frequency.getPct(value)))
-                .parallel()
-                .collect(Collectors.toList());
+
+        for (Map.Entry<String, Long> entry : map.entrySet()) {
+            list.add(new Word(entry.getKey(), entry.getValue(), (double) entry.getValue() / (double) totFreq));
+        }
 
         log.debug("count " + list.size());
         log.debug("init done, took: " + (System.currentTimeMillis() - cur));

@@ -22,4 +22,13 @@ public class Word {
     public double getFreq() {
         return freq;
     }
+
+    @Override
+    public String toString() {
+        return "Word{" +
+                "word='" + word + '\'' +
+                ", count=" + count +
+                ", freq=" + freq +
+                '}';
+    }
 }
