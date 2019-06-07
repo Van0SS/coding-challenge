@@ -1,5 +1,6 @@
 package com.van0ss.challenge.service;
 
+import com.google.common.collect.Streams;
 import com.google.common.io.Resources;
 import com.van0ss.challenge.model.Word;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +16,13 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Queue;
 import java.util.Scanner;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -23,7 +30,7 @@ public class WordService {
 
     private final Frequency frequency = new Frequency(String.CASE_INSENSITIVE_ORDER);
 
-    private final List<Word> list = new ArrayList<>();
+    private List<Word> list;
 
     @PostConstruct
     public void parse() {
@@ -47,10 +54,10 @@ public class WordService {
         }
         input.close();
         Iterator<Comparable<?>> iter = frequency.valuesIterator();
-        while (iter.hasNext()) {
-            Comparable<?> value = iter.next();
-            list.add(new Word(String.valueOf(value), frequency.getCount(value), frequency.getPct(value)));
-        }
+        list = Streams.stream(iter).map(value -> new Word(String.valueOf(value), frequency.getCount(value), frequency.getPct(value)))
+                .parallel()
+                .collect(Collectors.toList());
+
         log.debug("count " + list.size());
         log.debug("init done, took: " + (System.currentTimeMillis() - cur));
     }
